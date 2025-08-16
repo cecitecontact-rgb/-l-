@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mon Globe Interactif</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { margin: 0; background: #20232a; color: #fff; font-family: sans-serif; }
+    h1 { text-align: center; margin-top: 30px; }
+    #globeViz { width: 100%; max-width: 800px; height: 70vw; max-height: 800px; margin: 40px auto; display: block; }
+  </style>
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+<body>
+  <h1>Mon Globe Interactif</h1>
+  <div id="globeViz"></div>
+
+  <script>
+    const points = [
+      { lat: 48.8566, lon: 2.3522, label: "Paris", audio: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" },
+      { lat: 40.7128, lon: -74.0060, label: "New York", audio: "https://actions.google.com/sounds/v1/alarms/alarm_watch_beep.ogg" }
+    ];
+
+    function showAudioPopup(point) {
+      removeAudioPopup();
+      const pop = document.createElement('div');
+      pop.className = "audio-popup";
+      pop.style.position = 'fixed';
+      pop.style.left = '50%';
+      pop.style.top = '55%';
+      pop.style.transform = 'translate(-50%, -50%)';
+      pop.style.background = '#222';
+      pop.style.color = '#fff';
+      pop.style.boxShadow = '0 0 16px #0006';
+      pop.style.borderRadius = '10px';
+      pop.style.padding = '20px';
+      pop.style.zIndex = '9999';
+      pop.style.textAlign = 'center';
+      pop.innerHTML = `
+        <strong>${point.label}</strong><br>
+        <audio controls autoplay>
+          <source src="${point.audio}" type="audio/mpeg">
+          Votre navigateur ne supporte pas l'audio.
+        </audio><br>
+        <button onclick="removeAudioPopup()">Fermer</button>
+      `;
+      document.body.appendChild(pop);
+    }
+
+    window.removeAudioPopup = function() {
+      const exist = document.querySelector('.audio-popup');
+      if (exist) exist.remove();
+    };
+
+    const globe = Globe()
+      .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg")
+      .backgroundColor("#20232a")
+      .pointLat(p => p.lat)
+      .pointLng(p => p.lon)
+      .pointAltitude(0.03)
+      .pointRadius(0.35)
+      .pointColor(() => "#ff5252")
+      .pointLabel(p => `${p.label}`)
+      .pointsData(points)
+      .onPointClick(showAudioPopup);
+
+    document.getElementById("globeViz").appendChild(globe());
+  </script>
+</body>
+</html>
